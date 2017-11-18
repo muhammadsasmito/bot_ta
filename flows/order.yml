@@ -18,7 +18,7 @@ intents:
     attributes:
       quantity:
         nlu: quantity
-
+        
   yesno:
     type: data
     condition: payload.type == 'confirm'
@@ -80,6 +80,9 @@ states:
         condition: "context.answer == 'no'"
       - name: saveData
         condition: "context.answer == 'yes'"
+    enter:
+      data.quantity: "context.quantity"
+      data.pizza: "context.pizza"
 
 actions:
   saveData:
@@ -120,18 +123,18 @@ actions:
     options:
       type: button
       items:
-        text: "Benar pesanannya adalah $(context.pizza) sebanyak $(context.quantity)?"
+        text: "Benar $(context.pizza) sebanyak $(context.quantity)?"
         actions:
           - type: postback
             label: Ya
             payload:
               type: confirm
-              confirm: "yes"
+              confirm:  "yes"
           - type: postback
-            label: Tidak
+            label:  Tidak
             payload:
               type: confirm
-              confirm: "no"
+              confirm:  "no"
 
   pizzaOptionsDynamic:
     type: template

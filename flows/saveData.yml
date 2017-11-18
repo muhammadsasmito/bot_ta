@@ -1,4 +1,3 @@
-# pay attention on the condition "content == 'saveData'"
 intents:
   saveData:
     initial: true
@@ -9,7 +8,8 @@ states:
     initial: true
     end: true
     action:
-      name: testActions
+      - name: testActions
+      - name: saveDataAPI
     transitions:
       toDelivery:
         fallback: true
@@ -18,3 +18,12 @@ actions:
     type: text
     options:
       text: "Data sudah di save di database ya"
+  saveDataAPI:
+    type: api
+    options:
+      method: "POST"
+      body:
+        params:
+          - $(data.quantity)
+          - $(data.pizza)
+      uri: "http://b11f7ca6.ngrok.io/api/v1/insert"
