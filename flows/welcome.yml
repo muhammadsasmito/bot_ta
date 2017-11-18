@@ -1,0 +1,34 @@
+intents:
+  greeting:
+    initial: true
+    type: text
+    classifier:
+      nlu: qisg
+      match: greeting
+      priority: 10
+  reenter:
+    type: command
+    condition: content == 'reenter'
+
+states:
+  init:
+    initial: true
+    greet: 
+      float:
+        fallback: true
+      action:
+        - name: greetPerson
+          condition: "!context.greetCount"
+        - name: greetAgain
+          condition: "context.greetCount >= 1"
+      transit:
+        context.greetCount: "intent == 'greeting' ? (context.greetCount || 0) + 1 : 0"
+actions:
+  greetAgain:
+    type: text
+    options:
+      text: "Woi pesen dong"
+  greetPerson:
+    type: text
+    options:
+      text: "Halo, silahkan input 'Pesan dong' untuk pesan"

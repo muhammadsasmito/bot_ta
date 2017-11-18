@@ -1,0 +1,29 @@
+intents:
+  orderCommand:
+    initial: true
+    type: text
+    classifier:
+      nlu: order
+      match: pizzaOrder
+states:
+  init:
+    initial: true
+    action:
+      - name: pizzaOptions
+      - name: askOptions
+    transitions:
+      init:
+        fallback: true
+actions:
+  pizzaOptions:
+    # type: text
+    # options:
+    #   text: "
+    #     Kami punya pilihan menu:\n
+    #     1.) Peperoni \n
+    #     2.) Ronipepe \n"
+    type: "template"
+  askOptions:
+    type: text
+    options:
+      text: 'Mau yang mana?'
