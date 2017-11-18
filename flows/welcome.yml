@@ -5,29 +5,31 @@ intents:
     classifier:
       nlu: qisg
       match: greeting
-      priority: 10
+    priority: 10
+
   reenter:
     type: command
-    condition: content == 'reenter'
+    condition: content == "reenter"
 
 states:
   init:
     initial: true
-    greet: 
-      float:
-        fallback: true
-      action:
-        - name: greetPerson
-          condition: "!context.greetCount"
-        - name: greetAgain
-          condition: "context.greetCount >= 1"
-      transit:
-        context.greetCount: "intent == 'greeting' ? (context.greetCount || 0) + 1 : 0"
+    transit:
+      context.greetCount: "intent == 'greeting' ? (context.greetCount || 0) + 1 : 0"
+    action:
+      - name: greetPerson
+        condition: "!context.greetCount"
+      - name: greetAgain
+        condition: "context.greetCount >= 1"
+    float:
+      fallback: true
+
 actions:
   greetAgain:
     type: text
     options:
       text: "Woi pesen dong"
+
   greetPerson:
     type: text
     options:

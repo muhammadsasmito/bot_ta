@@ -1,7 +1,7 @@
 schema: kata.ai/schema/kata-ml/1.0
 name: coba
 desc: Bot Description
-version: 0.15.0
+version: 0.68.0
 flows:
     welcome: $include(./flows/welcome.yml)
     order: $include(./flows/order.yml)
@@ -9,10 +9,10 @@ flows:
 config:
     messages: $include(./messages.yml)
     maxRecursion: 10
-nlus: $include(./nlu.yml)
 methods:
     'confidenceLevel(message,context,data,options,config)':
         code: 'function confidenceLevel(message, context, data, options, config) { if (message.content === "hi") return 1; return 0; }'
         entry: confidenceLevel
+nlus: $include(./nlu.yml)
 id: '112'
 tag: null

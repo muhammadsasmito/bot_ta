@@ -1,7 +1,15 @@
-fallback: true
+# fallback: true
 intents:
+  hi:
+    initial: true
+    type: text
+    classifier:
+      nlu: greet
+  dunno:
+    fallback: true
   fallbackIntent:
       fallback: true
+      
 states:
   init:
     initial: true

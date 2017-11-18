@@ -5,25 +5,180 @@ intents:
     classifier:
       nlu: order
       match: pizzaOrder
+      
+  pizzaChosen:
+    inital: true
+    type: data
+    condition: payload.type == 'pizza'
+
+  pizzaQntty:
+    type: text
+    classifier:
+      nlu: quantity
+    attributes:
+      quantity:
+        nlu: quantity
+
+  yesno:
+    type: data
+    condition: payload.type == 'confirm'
+
+  reenter:
+    type: command
+    condition: content == "reenter"
+  
+
 states:
   init:
     initial: true
-    action:
-      - name: pizzaOptions
-      - name: askOptions
     transitions:
+      showPizza:
+        condition: "intent == 'orderCommand'"
       init:
         fallback: true
+    transit: jalaninArr
+  showPizza:
+    action:
+      - name: pizzaOptionsDynamic
+      - name: askOptions
+    transitions:
+      pizzaQuantity:
+        condition: "intent == 'pizzaChosen'"
+        mapping:
+          context.pizza: "payload.pizza" 
+      showPizza:
+        fallback: true
+  pizzaQuantity:
+    action:
+      - name: askQuantity
+    transitions:
+      confirmPizza:
+        condition: "intent == 'pizzaQntty'"
+        mapping:
+          context.quantity: "attributes.quantity"
+          context.answer: "null"
+      pizzaQuantity:
+        fallback: true
+  confirmPizza:
+    action:
+      - name: yesNoButton
+    transitions:
+      done:
+        fallback: true
+        mapping:
+          context.answer: "payload.confirm"
+    transit:
+      context.answer: "intent"
+  done:
+    end: true
+    action:
+      - name: sayThanks
+        condition: "context.answer == 'yes'"
+      - name: sayThanksSticker
+        condition: "context.answer == 'yes'"
+      - name: cancelOrder
+        condition: "context.answer == 'no'"
+      - name: saveData
+        condition: "context.answer == 'yes'"
+
 actions:
+  saveData:
+    type: command
+    options:
+      command: saveData
+
+  askQuantity:
+    type: text
+    options:
+      text: 'Mau pesan berapa banyak? (Min.1 Max.9)'
+
+  confirmPizza:
+    type: text
+    options:
+      text: "Jadi benar pesanannya adalah $(context.pizza)?"
+
+  cancelOrder:
+    type: text
+    options:
+      text: "Baiklah, silahkan pesan lagi di lain waktu"
+
+  sayThanks:
+    type: text
+    options:
+      text: "Terimakasih sudah memesan :)"
+
+  sayThanksSticker:
+    type: template
+    options:
+      type: sticker
+      items:
+        stickerId: '3'
+        packageId: '1'
+
+  yesNoButton:
+    type: template
+    options:
+      type: button
+      items:
+        text: "Benar pesanannya adalah $(context.pizza) sebanyak $(context.quantity)?"
+        actions:
+          - type: postback
+            label: Ya
+            payload:
+              type: confirm
+              confirm: "yes"
+          - type: postback
+            label: Tidak
+            payload:
+              type: confirm
+              confirm: "no"
+
+  pizzaOptionsDynamic:
+    type: template
+    options:
+      type: carousel
+      data: $(context.arr) 
+      template:
+        text: $[desc]
+        title: $[item]
+        actions:
+          - type: postback
+            label: $[item]
+            payload:
+              type: pizza
+              pizza: $[item]    
+
   pizzaOptions:
-    # type: text
-    # options:
-    #   text: "
-    #     Kami punya pilihan menu:\n
-    #     1.) Peperoni \n
-    #     2.) Ronipepe \n"
     type: "template"
+    options:
+      type: "carousel"
+      items:
+        - text: 'untuk penggemar bola pepe dan roni'
+          title: 'Pepperoni'
+          thumbnailImageUrl: https://www.cicis.com/media/1243/pizza_adven_zestypepperoni.png
+          actions:
+            - type: "postback"
+              label: 'Pepperoni'
+              payload:
+                type: pizza
+                pizza: pepperoni
+        - text: 'untuk pecinta ayam. Eaaaa'
+          title: 'Chick Lover'
+          thumbnailImageUrl: https://www.cicis.com/media/1243/pizza_adven_zestypepperoni.png
+          actions:
+            - type: "postback"
+              label: 'Chick Lover'
+              payload:
+                type: pizza
+                pizza: chicklover
+
   askOptions:
     type: text
     options:
       text: 'Mau yang mana?'
+
+methods:
+  jalaninArr(ctx): "
+      ctx.context.arr = [{'item':'Chicken', 'desc':'chick lover'},{'item':'Pepperoni', 'desc':'pepe rooney'}];
+      return ctx;
+  "
